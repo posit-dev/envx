@@ -3,12 +3,18 @@ IMAGE_NAME := 'envx'
 BUILDX_PATH := ''
 VERSION := `git describe --always --dirty --tags`
 
+default: build test
+
 test *ARGS:
   go test -v -coverprofile cover.out {{ARGS}} ./...
+
 
 build *ARGS:
   mkdir -p ./build && \
   CGO_ENABLED=0 go build -tags netgo -a -o build/envx {{ARGS}} ./cmd/envx/main.go
+
+smoke *ARGS:
+  build/envx --help
 
 docker-build:
   #!/usr/bin/env bash
