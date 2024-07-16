@@ -1,0 +1,29 @@
+name: main
+
+on:
+  pull_request: {}
+
+  push:
+    branches: [main]
+    tags: [v*]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: taiki-e/install-action@just
+
+      - run: just build
+
+      - run: just test
+
+      - run: just smoke
