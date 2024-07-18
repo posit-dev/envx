@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+
+main() {
+  : "${IMAGE_REGISTRY:=ghcr.io/posit-dev}"
+  : "${IMAGE_NAME:=envx}"
+
+  if [[ -z "${VERSION}" ]]; then
+    VERSION="$(git describe --always --dirty --tags)"
+    export VERSION
+  fi
+
+  BUILDER=''
+
+  declare -a BUILDX_ARGS
+
+  if [[ -n "${BUILDX_PATH}" ]]; then
+    BUILDER="--builder=${BUILDX_PATH}"
+    BUILDX_ARGS=(
+      '--cache-from=type=local,src=/tmp/.buildx-cache'
+      '--cache-to=type=local,dest=/tmp/.buildx-cache'
+    )
+  fi
+
+  set -o xtrace
+
+  # shellcheck disable=SC2086
+  exec docker buildx ${BUILDER} build --load "${BUILDX_ARGS[@]}" \
+    --platform='linux/amd64' \
+    -t "${IMAGE_REGISTRY}/${IMAGE_NAME}:${VERSION}" \
+    .
+}
+
+main "${@}"
