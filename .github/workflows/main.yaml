@@ -20,10 +20,8 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - uses: taiki-e/install-action@just
+      - run: make build
 
-      - run: just build
+      - run: make test
 
-      - run: just test
-
-      - run: just smoke
+      - run: make smoke
